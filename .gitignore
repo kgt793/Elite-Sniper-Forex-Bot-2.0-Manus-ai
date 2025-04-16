@@ -1,0 +1,33 @@
+# .gitignore for Forex Trading Bot
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local development settings
+.env
+*.db
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# Virtual Environment
+venv/
+env/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# IDE specific files
+.idea/
+.vscode/
+
+# Flask pid file
+flask.pid
+
+# Local data files
+data/
