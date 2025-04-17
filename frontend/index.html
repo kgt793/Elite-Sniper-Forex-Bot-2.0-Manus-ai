@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forex Trading Bot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #343a40;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        .card-header {
+            background-color: #343a40;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: bold;
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table th {
+            background-color: #f1f1f1;
+        }
+        .badge-success {
+            background-color: #28a745;
+        }
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .badge-danger {
+            background-color: #dc3545;
+        }
+        .badge-info {
+            background-color: #17a2b8;
+        }
+        .badge-primary {
+            background-color: #007bff;
+        }
+        .badge-secondary {
+            background-color: #6c757d;
+        }
+        .tab-content {
+            padding: 20px 0;
+        }
+        .nav-tabs .nav-link {
+            color: #495057;
+            font-weight: 500;
+        }
+        .nav-tabs .nav-link.active {
+            color: #343a40;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background-color: #343a40;
+            border-color: #343a40;
+        }
+        .btn-primary:hover {
+            background-color: #23272b;
+            border-color: #23272b;
+        }
+        .btn-outline-primary {
+            color: #343a40;
+            border-color: #343a40;
+        }
+        .btn-outline-primary:hover {
+            background-color: #343a40;
+            border-color: #343a40;
+        }
+        .form-control:focus {
+            border-color: #343a40;
+            box-shadow: 0 0 0 0.2rem rgba(52, 58, 64, 0.25);
+        }
+        .risk-calculator {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .signal-card {
+            transition: transform 0.3s;
+        }
+        .signal-card:hover {
+            transform: translateY(-5px);
+        }
+        .pattern-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .currency-pair-card {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .currency-pair-card:hover {
+            background-color: #f1f1f1;
+        }
+        .currency-pair-card.selected {
+            background-color: #e9ecef;
+            border-left: 4px solid #343a40;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: #343a40;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .mobile-friendly-table {
+            overflow-x: auto;
+        }
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 0.75rem;
+            }
+            .table td, .table th {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-currency-exchange me-2"></i>
+                Forex Trading Bot
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-bs-toggle="tab" data-bs-target="#dashboard">
+                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#signals">
+                            <i class="bi bi-graph-up me-1"></i> Signals
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#pairs">
+                            <i class="bi bi-currency-dollar me-1"></i> Pairs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#patterns">
+                            <i class="bi bi-bar-chart me-1"></i> Patterns
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#settings">
+                            <i class="bi bi-gear me-1"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="tab-content">
+            <!-- Dashboard Tab -->
+            <div class="tab-pane fade show active" id="dashboard">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Account Summary</span>
+                                <button class="btn btn-sm btn-outline-light refresh-account">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Balance:</span>
+                                    <span class="fw-bold account-balance">$5,000.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Risk per Trade:</span>
+                                    <span class="fw-bold">0.2% ($10.00)</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Max Drawdown:</span>
+                                    <span class="fw-bold">8% ($400.00)</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Drawdown Threshold:</span>
+                                    <span class="fw-bold text-danger">$4,600.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                Risk Calculator
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="pair" class="form-label">Currency Pair</label>
+                                    <select class="form-select" id="pair">
+                                        <option value="EUR/USD">EUR/USD</option>
+                                        <option value="GBP/USD">GBP/USD</option>
+                                        <option value="USD/JPY">USD/JPY</option>
+                                        <option value="AUD/USD">AUD/USD</option>
+                                        <option value="USD/CAD">USD/CAD</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="entry" class="form-label">Entry Price</label>
+                                    <input type="number" class="form-control" id="entry" step="0.00001">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="stop" class="form-label">Stop Loss</label>
+                                    <input type="number" class="form-control" id="stop" step="0.00001">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="risk-reward" class="form-label">Risk:Reward Ratio</label>
+                                    <select class="form-select" id="risk-reward">
+                                        <option value="1">1:1</option>
+                                        <option value="1.5">1:1.5</option>
+                                        <option value="2" selected>1:2</option>
+                                        <option value="3">1:3</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary w-100 calculate-risk">Calculate</button>
+                                
+                                <div class="mt-3 risk-results d-none">
+                                    <hr>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Risk Amount:</span>
+                                        <span class="fw-bold risk-amount">$10.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Position Size:</span>
+                                        <span class="fw-bold position-size">0.1 lots</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Take Profit:</span>
+                                        <span class="fw-bold take-profit">1.0950</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Latest Trading Signals</span>
+                                <button class="btn btn-sm btn-outline-light refresh-signals">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="mobile-friendly-table">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Pair</th>
+                                                <th>Type</th>
+                                                <th>Entry</th>
+                                                <th>SL</th>
+                                                <th>TP</th>
+                                                <th>Risk</th>
+                                                <th>Conf</th>
+                                                <th>Duration</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="signals-table">
+                                            <tr>
+                                                <td>EUR/USD</td>
+                                                <td>Bullish Breakout</td>
+                                                <td>1.0850</td>
+                                                <td>1.0820</td>
+                                                <td>1.0910</td>
+                                                <td>$10.00</td>
+                                                <td>85%</td>
+                                                <td>2-3 days</td>
+                                            </tr>
+                                            <tr>
+                                                <td>GBP/JPY</td>
+                                                <td>Double Bottom</td>
+                                                <td>185.20</td>
+                                                <td>184.50</td>
+                                                <td>187.40</td>
+                                                <td>$11.67</td>
+                                                <td>92%</td>
+                                                <td>1-2 days</td>
+                                            </tr>
+                                            <tr>
+                                                <td>USD/CAD</td>
+                                                <td>Head & Shoulders</td>
+                                                <td>1.3620</td>
+                                                <td>1.3650</td>
+                                                <td>1.3560</td>
+                                                <td>$10.00</td>
+                                                <td>78%</td>
+                                                <td>3-4 days</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Recent Breakouts</span>
+                                <button class="btn btn-sm btn-outline-light refresh-breakouts">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="mobile-friendly-table">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Pair</th>
+                                                <th>Type</th>
+                                                <th>Price</th>
+                                                <th>Strength</th>
+                                                <th>Confirmed</th>
+                                                <th>Detected</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="breakouts-table">
+                                            <tr>
+                                                <td>EUR/USD</td>
+                                                <td>Resistance Breakout</td>
+                                                <td>1.0850</td>
+                                                <td>High</td>
+                                                <td>Yes</td>
+                                                <td>2025-04-16 08:30</td>
+                                            </tr>
+                                            <tr>
+                                                <td>GBP/USD</td>
+                                                <td>Trendline Breakout</td>
+                                                <td>1.2640</td>
+                                                <td>Medium</td>
+                                                <td>Yes</td>
+                                                <td>2025-04-16 07:15</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signals Tab -->
+            <div class="tab-pane fade" id="signals">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>All Trading Signals</span>
+                        <div>
+                            <select class="form-select form-select-sm d-inline-block w-auto me-2" id="confidence-filter">
+                                <option value="0">All Signals</option>
+                                <option value="75" selected>75%+ Confidence</option>
+                                <option value="85">85%+ Confidence</option>
+                                <option value="90">90%+ Confidence</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-light refresh-all-signals">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mobile-friendly-table">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Pair</th>
+                                        <th>Type</th>
+                                        <th>Entry</th>
+                                        <th>SL</th>
+                                        <th>TP</th>
+                                        <th>Risk</th>
+                                        <th>Conf</th>
+                                        <th>Duration</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="all-signals-table">
+                                    <tr>
+                                        <td>EUR/USD</td>
+                                        <td>Bullish Breakout</td>
+                                        <td>1.0850</td>
+                                        <td>1.0820</td>
+                                        <td>1.0910</td>
+                                        <td>$10.00</td>
+                                        <td>85%</td>
+                                        <td>2-3 days</td>
+                                        <td>2025-04-16 10:30</td>
+                                    </tr>
+                                    <tr>
+                                        <td>GBP/JPY</td>
+                                        <td>Double Bottom</td>
+                                        <td>185.20</td>
+                                        <td>184.50</td>
+                                        <td>187.40</td>
+                                        <td>$11.67</td>
+                                        <td>92%</td>
+                                        <td>1-2 days</td>
+                                        <td>2025-04-16 09:15</td>
+                                    </tr>
+                                    <tr>
+                                        <td>USD/CAD</td>
+                                        <td>Head & Shoulders</td>
+                                        <td>1.3620</td>
+                                        <td>1.3650</td>
+                                        <td>1.3560</td>
+                                        <td>$10.00</td>
+                                        <td>78%</td>
+                                        <td>3-4 days</td>
+                                        <td>2025-04-16 08:45</td>
+                                    </tr>
+                                    <tr>
+                                        <td>AUD/USD</td>
+                                        <td>Flag Pattern</td>
+                                        <td>0.6580</td>
+                                        <td>0.6550</td>
+                                        <td>0.6640</td>
+                                        <td>$10.00</td>
+                                        <td>76%</td>
+                                        <td>2-3 days</td>
+                                        <td>2025-04-16 07:30</td>
+                                    </tr>
+                                    <tr>
+                                        <td>USD/JPY</td>
+                                        <td>Triangle Breakout</td>
+                                        <td>151.80</td>
+                                        <td>151.40</td>
+                                        <td>152.60</td>
+                                        <td>$10.00</td>
+                                        <td>88%</td>
+                                        <td>2-3 days</td>
+                                        <td>2025-04-16 06:15</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        Pattern Verification
+                    </div>
+                    <div class="card-body">
+                        <form id="pattern-verification-form">
+                            <div class="mb-3">
+                                <label for="pair-select" class="form-label">Currency Pair</label>
+                                <select class="form-select" id="pair-select">
+                                    <option value="EUR/USD">EUR/USD</option>
+                                    <option value="GBP/USD">GBP/USD</option>
+                                    <option value="USD/JPY">USD/JPY</option>
+                                    <option value="AUD/USD">AUD/USD</option>
+                                    <option value="USD/CAD">USD/CAD</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="screenshot" class="form-label">Upload TradingView Screenshot</label>
+                                <input class="form-control" type="file" id="screenshot" accept="image/*">
+                                <div class="form-text">Upload a screenshot of the chart pattern you want to verify.</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Verify Pattern</button>
+                        </form>
+                        
+                        <div class="mt-4 verification-results d-none">
+                            <hr>
+                            <h5>Verification Results</h5>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Pattern Detected:</span>
+                                <span class="fw-bold pattern-name">Double Bottom</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Confidence:</span>
+                                <span class="fw-bold pattern-confidence">87%</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Suggested Entry:</span>
+                                <span class="fw-bold pattern-entry">1.0850</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Suggested Stop Loss:</span>
+                                <span class="fw-bold pattern-sl">1.0820</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Suggested Take Profit:</span>
+                                <span class="fw-bold pattern-tp">1.0910</span>
+                            </div>
+                            <div class="mt-3">
+                                <img src="#" alt="Analyzed Chart" class="img-fluid d-none analyzed-chart">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pairs Tab -->
+            <div class="tab-pane fade" id="pairs">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                Major Pairs
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="EUR/USD">
+                                        <div>
+                                            <strong>EUR/USD</strong>
+                                            <div class="small text-muted">Euro / US Dollar</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">1.0850</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="USD/JPY">
+                                        <div>
+                                            <strong>USD/JPY</strong>
+                                            <div class="small text-muted">US Dollar / Japanese Yen</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">151.80</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="GBP/USD">
+                                        <div>
+                                            <strong>GBP/USD</strong>
+                                            <div class="small text-muted">British Pound / US Dollar</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">1.2640</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="USD/CHF">
+                                        <div>
+                                            <strong>USD/CHF</strong>
+                                            <div class="small text-muted">US Dollar / Swiss Franc</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">0.9120</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="AUD/USD">
+                                        <div>
+                                            <strong>AUD/USD</strong>
+                                            <div class="small text-muted">Australian Dollar / US Dollar</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">0.6580</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="USD/CAD">
+                                        <div>
+                                            <strong>USD/CAD</strong>
+                                            <div class="small text-muted">US Dollar / Canadian Dollar</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">1.3620</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="NZD/USD">
+                                        <div>
+                                            <strong>NZD/USD</strong>
+                                            <div class="small text-muted">New Zealand Dollar / US Dollar</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">0.5980</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                Cross Pairs
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="EUR/GBP">
+                                        <div>
+                                            <strong>EUR/GBP</strong>
+                                            <div class="small text-muted">Euro / British Pound</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">0.8580</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="EUR/JPY">
+                                        <div>
+                                            <strong>EUR/JPY</strong>
+                                            <div class="small text-muted">Euro / Japanese Yen</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">164.70</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="GBP/JPY">
+                                        <div>
+                                            <strong>GBP/JPY</strong>
+                                            <div class="small text-muted">British Pound / Japanese Yen</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">185.20</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="AUD/JPY">
+                                        <div>
+                                            <strong>AUD/JPY</strong>
+                                            <div class="small text-muted">Australian Dollar / Japanese Yen</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">99.80</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="EUR/AUD">
+                                        <div>
+                                            <strong>EUR/AUD</strong>
+                                            <div class="small text-muted">Euro / Australian Dollar</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">1.6480</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                Exotic Pairs
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="USD/SGD">
+                                        <div>
+                                            <strong>USD/SGD</strong>
+                                            <div class="small text-muted">US Dollar / Singapore Dollar</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">1.3520</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="USD/HKD">
+                                        <div>
+                                            <strong>USD/HKD</strong>
+                                            <div class="small text-muted">US Dollar / Hong Kong Dollar</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">7.8120</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="USD/TRY">
+                                        <div>
+                                            <strong>USD/TRY</strong>
+                                            <div class="small text-muted">US Dollar / Turkish Lira</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">32.4580</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center currency-pair-card" data-pair="USD/MXN">
+                                        <div>
+                                            <strong>USD/MXN</strong>
+                                            <div class="small text-muted">US Dollar / Mexican Peso</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">16.8240</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                Pair Details
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center mb-3">
+                                    <h4 class="selected-pair">Select a pair</h4>
+                                    <div class="selected-pair-rate fs-1 fw-bold">-</div>
+                                    <div class="selected-pair-change small">-</div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-6">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Pip Value:</span>
+                                            <span class="fw-bold pair-pip-value">-</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Spread:</span>
+                                            <span class="fw-bold pair-spread">-</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Daily Range:</span>
+                                            <span class="fw-bold pair-range">-</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Updated:</span>
+                                            <span class="fw-bold pair-updated">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patterns Tab -->
+            <div class="tab-pane fade" id="patterns">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                Reversal Patterns
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-arrow-down-square"></i></div>
+                                        <h6>Head and Shoulders</h6>
+                                        <span class="badge bg-danger">Bearish</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-arrow-up-square"></i></div>
+                                        <h6>Inverse H&S</h6>
+                                        <span class="badge bg-success">Bullish</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-arrow-down-square"></i></div>
+                                        <h6>Double Top</h6>
+                                        <span class="badge bg-danger">Bearish</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-arrow-up-square"></i></div>
+                                        <h6>Double Bottom</h6>
+                                        <span class="badge bg-success">Bullish</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-arrow-down-square"></i></div>
+                                        <h6>Triple Top</h6>
+                                        <span class="badge bg-danger">Bearish</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-arrow-up-square"></i></div>
+                                        <h6>Triple Bottom</h6>
+                                        <span class="badge bg-success">Bullish</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-arrow-down-square"></i></div>
+                                        <h6>Rounding Top</h6>
+                                        <span class="badge bg-danger">Bearish</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-arrow-up-square"></i></div>
+                                        <h6>Rounding Bottom</h6>
+                                        <span class="badge bg-success">Bullish</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                Continuation Patterns
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-flag"></i></div>
+                                        <h6>Bullish Flag</h6>
+                                        <span class="badge bg-success">Bullish</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-flag-fill"></i></div>
+                                        <h6>Bearish Flag</h6>
+                                        <span class="badge bg-danger">Bearish</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-triangle"></i></div>
+                                        <h6>Pennant</h6>
+                                        <span class="badge bg-secondary">Bilateral</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-triangle-half"></i></div>
+                                        <h6>Wedge</h6>
+                                        <span class="badge bg-secondary">Bilateral</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-square"></i></div>
+                                        <h6>Rectangle</h6>
+                                        <span class="badge bg-secondary">Bilateral</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-cup-hot"></i></div>
+                                        <h6>Cup and Handle</h6>
+                                        <span class="badge bg-success">Bullish</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                Bilateral Patterns
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-triangle"></i></div>
+                                        <h6>Ascending Triangle</h6>
+                                        <span class="badge bg-success">Bullish</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-triangle"></i></div>
+                                        <h6>Descending Triangle</h6>
+                                        <span class="badge bg-danger">Bearish</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-triangle"></i></div>
+                                        <h6>Symmetrical Triangle</h6>
+                                        <span class="badge bg-secondary">Bilateral</span>
+                                    </div>
+                                    <div class="col-6 mb-4 text-center">
+                                        <div class="pattern-icon"><i class="bi bi-diamond"></i></div>
+                                        <h6>Diamond</h6>
+                                        <span class="badge bg-secondary">Bilateral</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                Pattern Detection
+                            </div>
+                            <div class="card-body">
+                                <p>The Forex Trading Bot uses advanced algorithms to detect chart patterns in real-time. Pattern detection includes:</p>
+                                <ul>
+                                    <li>Automatic identification of 15+ chart patterns</li>
+                                    <li>Confidence scoring based on pattern quality</li>
+                                    <li>Multi-timeframe confirmation</li>
+                                    <li>False breakout filtering</li>
+                                    <li>TradingView screenshot verification</li>
+                                </ul>
+                                <p>Detected patterns are displayed in the Signals tab with entry, stop loss, and take profit levels calculated based on your risk parameters.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-pane fade" id="settings">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                Account Settings
+                            </div>
+                            <div class="card-body">
+                                <form id="account-settings-form">
+                                    <div class="mb-3">
+                                        <label for="balance" class="form-label">Account Balance</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="balance" value="5000">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="risk-percentage" class="form-label">Risk per Trade (%)</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="risk-percentage" value="0.2" step="0.1" min="0.1" max="5">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                        <div class="form-text">Recommended: 0.2% to 1% of account balance</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="drawdown-percentage" class="form-label">Max Drawdown (%)</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="drawdown-percentage" value="8" step="1" min="1" max="20">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                        <div class="form-text">Based on previous day's balance</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Account Settings</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                Telegram Bot Settings
+                            </div>
+                            <div class="card-body">
+                                <form id="telegram-settings-form">
+                                    <div class="mb-3">
+                                        <label for="telegram-token" class="form-label">Telegram Bot Token</label>
+                                        <input type="text" class="form-control" id="telegram-token" value="7895580284:AAGTKQSDJzst5Ri7ZMeQcQiGQOFbt9_sNzo">
+                                        <div class="form-text">Your Telegram bot token from BotFather</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="webapp-url" class="form-label">WebApp URL</label>
+                                        <input type="text" class="form-control" id="webapp-url" value="https://your-render-url.onrender.com">
+                                        <div class="form-text">The URL of your deployed web application</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Telegram Settings</button>
+                                    <button type="button" class="btn btn-outline-primary ms-2" id="start-telegram-bot">Start Bot</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                Signal Settings
+                            </div>
+                            <div class="card-body">
+                                <form id="signal-settings-form">
+                                    <div class="mb-3">
+                                        <label for="min-confidence" class="form-label">Minimum Confidence (%)</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="min-confidence" value="75" step="5" min="50" max="95">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                        <div class="form-text">Minimum confidence level for signals</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="confirmation-indicators" class="form-label">Required Confirmation Indicators</label>
+                                        <select class="form-select" id="confirmation-indicators">
+                                            <option value="1">1 indicator</option>
+                                            <option value="2">2 indicators</option>
+                                            <option value="3" selected>3 indicators</option>
+                                            <option value="4">4 indicators</option>
+                                        </select>
+                                        <div class="form-text">Number of indicators required to confirm a signal</div>
+                                    </div>
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="enable-pattern-verification" checked>
+                                        <label class="form-check-label" for="enable-pattern-verification">Enable Pattern Verification</label>
+                                        <div class="form-text">Verify patterns using TradingView screenshots</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Signal Settings</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">Forex Trading Bot &copy; 2025 | Risk Warning: Trading foreign exchange carries a high level of risk.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Currency pair selection
+            const currencyPairCards = document.querySelectorAll('.currency-pair-card');
+            currencyPairCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selected class from all cards
+                    currencyPairCards.forEach(c => c.classList.remove('selected'));
+                    
+                    // Add selected class to clicked card
+                    this.classList.add('selected');
+                    
+                    // Update pair details
+                    const pair = this.getAttribute('data-pair');
+                    const rate = this.querySelector('.badge').textContent;
+                    
+                    document.querySelector('.selected-pair').textContent = pair;
+                    document.querySelector('.selected-pair-rate').textContent = rate;
+                    document.querySelector('.selected-pair-change').textContent = '+0.0012 (+0.11%)';
+                    document.querySelector('.pair-pip-value').textContent = pair.includes('JPY') ? '¥1000 per pip' : '$10 per pip';
+                    document.querySelector('.pair-spread').textContent = pair.includes('JPY') ? '0.3 pips' : '0.5 pips';
+                    document.querySelector('.pair-range').textContent = pair.includes('JPY') ? '80 pips' : '50 pips';
+                    document.querySelector('.pair-updated').textContent = new Date().toLocaleTimeString();
+                });
+            });
+
+            // Risk calculator
+            const calculateRiskBtn = document.querySelector('.calculate-risk');
+            calculateRiskBtn.addEventListener('click', function() {
+                const entry = parseFloat(document.getElementById('entry').value);
+                const stop = parseFloat(document.getElementById('stop').value);
+                const riskReward = parseFloat(document.getElementById('risk-reward').value);
+                
+                if (isNaN(entry) || isNaN(stop)) {
+                    alert('Please enter valid entry and stop loss prices');
+                    return;
+                }
+                
+                const riskAmount = 10; // 0.2% of $5000
+                const priceDifference = Math.abs(entry - stop);
+                const positionSize = (riskAmount / priceDifference).toFixed(2);
+                
+                let takeProfit;
+                if (entry > stop) {
+                    // Long position
+                    takeProfit = (entry + (priceDifference * riskReward)).toFixed(5);
+                } else {
+                    // Short position
+                    takeProfit = (entry - (priceDifference * riskReward)).toFixed(5);
+                }
+                
+                document.querySelector('.risk-amount').textContent = '$' + riskAmount.toFixed(2);
+                document.querySelector('.position-size').textContent = positionSize + ' lots';
+                document.querySelector('.take-profit').textContent = takeProfit;
+                
+                document.querySelector('.risk-results').classList.remove('d-none');
+            });
+
+            // Pattern verification form
+            const patternVerificationForm = document.getElementById('pattern-verification-form');
+            patternVerificationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const screenshot = document.getElementById('screenshot').files[0];
+                if (!screenshot) {
+                    alert('Please upload a TradingView screenshot');
+                    return;
+                }
+                
+                // Simulate pattern verification (in a real app, this would send the image to the backend)
+                setTimeout(() => {
+                    document.querySelector('.pattern-name').textContent = 'Double Bottom';
+                    document.querySelector('.pattern-confidence').textContent = '87%';
+                    document.querySelector('.pattern-entry').textContent = '1.0850';
+                    document.querySelector('.pattern-sl').textContent = '1.0820';
+                    document.querySelector('.pattern-tp').textContent = '1.0910';
+                    
+                    const analyzedChart = document.querySelector('.analyzed-chart');
+                    analyzedChart.src = URL.createObjectURL(screenshot);
+                    analyzedChart.classList.remove('d-none');
+                    
+                    document.querySelector('.verification-results').classList.remove('d-none');
+                }, 1500);
+            });
+
+            // Account settings form
+            const accountSettingsForm = document.getElementById('account-settings-form');
+            accountSettingsForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const balance = parseFloat(document.getElementById('balance').value);
+                const riskPercentage = parseFloat(document.getElementById('risk-percentage').value);
+                const drawdownPercentage = parseFloat(document.getElementById('drawdown-percentage').value);
+                
+                if (isNaN(balance) || isNaN(riskPercentage) || isNaN(drawdownPercentage)) {
+                    alert('Please enter valid values');
+                    return;
+                }
+                
+                // Update account display
+                const riskAmount = (balance * (riskPercentage / 100)).toFixed(2);
+                const drawdownAmount = (balance * (drawdownPercentage / 100)).toFixed(2);
+                const drawdownThreshold = (balance - drawdownAmount).toFixed(2);
+                
+                document.querySelector('.account-balance').textContent = '$' + balance.toFixed(2);
+                document.querySelector('.account-balance').nextElementSibling.textContent = riskPercentage + '% ($' + riskAmount + ')';
+                document.querySelector('.account-balance').nextElementSibling.nextElementSibling.textContent = drawdownPercentage + '% ($' + drawdownAmount + ')';
+                document.querySelector('.account-balance').nextElementSibling.nextElementSibling.nextElementSibling.textContent = '$' + drawdownThreshold;
+                
+                alert('Account settings saved successfully');
+            });
+
+            // Telegram settings form
+            const telegramSettingsForm = document.getElementById('telegram-settings-form');
+            telegramSettingsForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const token = document.getElementById('telegram-token').value;
+                const webappUrl = document.getElementById('webapp-url').value;
+                
+                if (!token || !webappUrl) {
+                    alert('Please enter valid Telegram bot token and WebApp URL');
+                    return;
+                }
+                
+                alert('Telegram settings saved successfully');
+            });
+
+            // Start Telegram bot button
+            const startTelegramBotBtn = document.getElementById('start-telegram-bot');
+            startTelegramBotBtn.addEventListener('click', function() {
+                alert('Telegram bot started successfully. You can now access it through your Telegram app.');
+            });
+
+            // Signal settings form
+            const signalSettingsForm = document.getElementById('signal-settings-form');
+            signalSettingsForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const minConfidence = parseInt(document.getElementById('min-confidence').value);
+                const confirmationIndicators = parseInt(document.getElementById('confirmation-indicators').value);
+                const enablePatternVerification = document.getElementById('enable-pattern-verification').checked;
+                
+                if (isNaN(minConfidence) || isNaN(confirmationIndicators)) {
+                    alert('Please enter valid values');
+                    return;
+                }
+                
+                alert('Signal settings saved successfully');
+            });
+        });
+    </script>
+</body>
+</html>
