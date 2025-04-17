@@ -1,0 +1,9 @@
+ * Serving Flask app '/home/ubuntu/forex_trading_bot/backend/app.py'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://169.254.0.21:5000
+[33mPress CTRL+C to quit[0m
+10.54.10.1 - - [15/Apr/2025 12:50:02] "[33mHEAD / HTTP/1.1[0m" 404 -
+10.54.10.1 - - [15/Apr/2025 12:50:02] "[33mGET / HTTP/1.1[0m" 404 -
